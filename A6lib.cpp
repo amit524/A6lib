@@ -431,3 +431,31 @@ byte A6lib::A6waitFor(const char *resp1, const char *resp2, int timeout, String 
     }
     return retVal;
 }
+
+
+// making modem functioning or free from previous engagements
+int A6lib::getFree(long timeout)
+{
+	byte retval=A6_NOTOK;
+    logln(F("Setting module free from past command..."));
+	//long ptime=millis();
+	//long now=0;
+	while(1)
+	{
+		//now=millis();
+		// if(now-ptime > timeout || retval==0)
+		{
+		A6conn->write("\r\n");
+		delay(1000);
+        byte retval=A6command("AT", "OK", "yy", 1000, 1, NULL);
+		if(retval==A6_OK)
+			log("breaking out:\t");
+			//log(now);
+			log("\t\t");
+			logln(retval);
+			break;
+		}
+	
+	}
+    return A6_OK;
+}

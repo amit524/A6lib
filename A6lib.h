@@ -20,7 +20,9 @@
 #define A6_FAILURE 3
 
 #define A6_CMD_TIMEOUT 2000
-
+#define TIMEOUT_HTTP_RESPONSE 3000
+// expected length of response from http request on Bytes
+#define EXPECTED_RESPONSE_LENGTH  1000
 
 enum call_direction {
     DIR_OUTGOING = 0,
@@ -90,6 +92,8 @@ public:
     SMSmessage readSMS(int index);
     byte deleteSMS(int index);
     byte setSMScharset(String charset);
+
+    int getFree(long timeout);
 
     void setVol(byte level);
     void enableSpeaker(byte enable);
