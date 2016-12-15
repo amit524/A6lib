@@ -197,7 +197,132 @@ bool A6httplib::Get(String host, String path)
   logln("closed");
   _A6l->A6command((const char *)"AT+CIPSTATUS", "OK", "yy", 10000, 2, NULL);
   logln(F("http request done"));
-
-
 }
 
+bool A6httplib::Post(String host, String path, String body)
+{
+
+	_host = host;
+	_path = path;
+
+	_port=80;
+	char end_c[2];
+	end_c[0]=0x1a;
+	end_c[1]='\0'; 
+
+	byte var=A6_NOTOK;
+
+    dummy_string="AT+CIPSTART=\"TCP\",\"" + _host + "\"," + _port;
+	while(var!=A6_OK)
+	{
+		//close prior connections if any.
+        _A6l->A6command("AT+CIPCLOSE", "OK", "yy", 2000, 2, NULL); //start up the connection
+
+		var=_A6l->A6command(dummy_string.c_str(), "CONNECT OK", "yy", 30000, 1, NULL); //start up the connection
+        //logln(dummy_string.c_str());
+        logln(var);
+        while(_A6l->getFree(3000)!=0);
+        _A6l->A6command("AT+CSQ", "OK", "yy", 2000, 2, NULL); //start up the connection
+        logln("AT+CSQ");
+        delay(200);
+        while(_A6l->getFree(3000)!=0);
+
+    }
+  
+    logln(F("checking current staus : issued cipstart command"));
+    _A6l->A6command((const char *)"AT+CIPSTATUS", "OK", "yy", 10000, 2, NULL);
+        logln(F("AT+CIPSTATUS"));
+    _A6l->A6command((const char *)"AT+CIPSEND", ">", "yy", 10000, 1, NULL); //begin send data to remote server
+    	logln(F("AT+CIPSEND"));
+    delay(500);
+
+    dummy_string="POST "+ _path;
+    _A6l->A6conn->write(dummy_string.c_str());
+    	log("POST "+ _path);
+    _A6l->A6conn->write(" HTTP/1.0");
+    	log(F(" HTTP/1.0"));
+    _A6l->A6conn->write("\r\n");
+    	log("\r\n");
+
+    _A6l->A6conn->write("User-Agent: A6 Modem");
+    	log(F("User-Agent: A6 Modem"));
+    _A6l->A6conn->write("\r\n");
+    	log("\r\n");
+
+    _A6l->A6conn->write("HOST: ");
+    	log(F("HOST: "));
+    _A6l->A6conn->write(_host.c_str());
+    	log(_host);
+    _A6l->A6conn->write("\r\n");
+    	log("\r\n");
+
+
+        // Adding two custom headers for Iotfy platform.
+
+    dummy_string  = "X-IOTFY-ID: ";
+    dummy_string += X_IOTFY_ID;
+    _A6l->A6conn->write(dummy_string.c_str());
+    _A6l->A6conn->write("\r\n");
+
+    logln(dummy_string.c_str()) ; 
+    //A6conn->write("\r\n");
+    //	log("\r\n");
+    dummy_string  = "X-IOTFY-CLIENT: ";
+    dummy_string += X_IOTFY_CLIENT;
+    _A6l->A6conn->write(dummy_string.c_str());
+    _A6l->A6conn->write("\r\n");
+
+    logln(dummy_string.c_str()) ; 
+        // custom headers end 
+
+    dummy_string="Content-Type: application/json";
+    _A6l->A6conn->write(dummy_string.c_str());
+    _A6l->A6conn->write("\r\n");
+    logln(dummy_string.c_str()) ; 
+
+    dummy_string = "Content-Length: ";
+    dummy_string += body.length();
+    _A6l->A6conn->write(dummy_string.c_str());
+    _A6l->A6conn->write("\r\n");
+
+    logln(dummy_string.c_str()) ; 
+    //	  logln();
+
+    _A6l->A6conn->write("Connection: close");
+    log(F("Connection: close"));
+
+    _A6l->A6conn->write("\r\n");	  
+    _A6l->A6conn->write("\r\n");	  
+    logln();
+    logln();
+
+    _A6l->A6conn->write(body.c_str());
+    	log(body);
+    _A6l->A6conn->write("\r\n");
+    	log("\r\n");
+
+      // A6conn->write("\r\n");
+      // log("\r\n");
+    _A6l->A6command(end_c, "OK", "yy", 30000, 1, NULL); //begin send data to remote server
+    	  //while(getFree(3000)!=A6_OK);
+    long ptime=millis();
+    int response_bytes=0;
+    while(millis() - ptime < TIMEOUT_HTTP_RESPONSE && response_bytes < EXPECTED_RESPONSE_LENGTH)
+    {
+    	if(_A6l->A6conn->available())
+    	{
+    		log((char)_A6l->A6conn->read());
+    		response_bytes++;
+    	}
+
+    	//do further things here like storing data in some variable.
+    }
+
+    logln(F("now going to close tcp connection"));
+    _A6l->A6command((const char *)"AT+CIPCLOSE", "OK", "yy", 15000, 1, NULL); 
+    delay(100);
+    logln(F("closed"));
+    _A6l->A6command((const char *)"AT+CIPSTATUS", "OK", "yy", 10000, 1, NULL);
+    logln(F("http request done"));
+
+}
