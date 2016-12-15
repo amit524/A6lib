@@ -23,8 +23,8 @@ public:
 
     bool AddHeader(String header);
     bool Post(String host, String path, String body);
-    bool Get(String host, String path);
-
+    String Get(String host, String path);
+    String getResponseData(String);
 };
 #endif
 
