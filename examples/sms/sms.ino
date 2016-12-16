@@ -1,11 +1,13 @@
 #include <A6lib.h>
 
-// Instantiate the library with TxPin, RxPin.
-A6lib A6l(7, 8);
-//tx and rx pins are opposite side to antenna as of today's date.
-//arduino pin 7 to pin 9 of A6
-//arduino pin 8 to pin 8 of A6
+#ifndef ESP8266
+#define D0 0
+#define D5 8
+#define D6 7
+#endif
 
+// Instantiate the library with TxPin, RxPin.
+A6lib A6l(D6, D5);
 
 int unreadSMSLocs[30] = {0};
 int unreadSMSNum = 0;
@@ -24,28 +26,23 @@ void setup() {
 void loop() {
     callInfo cinfo = A6l.checkCallStatus();
     if (cinfo.direction == DIR_INCOMING) {
-       if (cinfo.number == "919999999999")
-        {
-          //add + before your country code as it doesn't appear in the if messages don't get send ex-
-          // CLIP: "91**********",145,,,,1
-          // String new_number="+" + cinfo.number;
-          // Serial.println(new_number);
-           A6l.sendSMS(new_number, "I can't come to the phone right now, I'm a machine.");
+        if ("+1132352890".endsWith(cinfo.number)) {
+            // If the number that sent the SMS is ours, reply.
+            A6l.sendSMS(new_number, "I can't come to the phone right now, I'm a machine.");
+            A6l.hangUp();
         }
-        A6l.hangUp();
+
+        // Get the memory locations of unread SMS messages.
+        unreadSMSNum = A6l.getUnreadSMSLocs(unreadSMSLocs, 30);
+
+        for (int i = 0; i < unreadSMSNum; i++) {
+            Serial.print("New message at index: ");
+            Serial.println(unreadSMSLocs[i], DEC);
+
+            sms = A6l.readSMS(unreadSMSLocs[i]);
+            Serial.println(sms.number);
+            Serial.println(sms.date);
+            Serial.println(sms.message);
+        }
+        delay(1000);
     }
-
-    // Get the memory locations of unread SMS messages.
-    unreadSMSNum = A6l.getUnreadSMSLocs(unreadSMSLocs, 30);
-
-    for (int i=0; i < unreadSMSNum; i++) {
-        Serial.print("New message at index: ");
-        Serial.println(unreadSMSLocs[i], DEC);
-
-        sms = A6l.readSMS(unreadSMSLocs[i]);
-        Serial.println(sms.number);
-        Serial.println(sms.date);
-        Serial.println(sms.message);
-    }
-    delay(1000);
-}
