@@ -2,13 +2,10 @@
 #include <A6lib.h>
 #include "A6httplib.h"
 
-    // String X_IOTFY_ID = "24580020";
-    // String X_IOTFY_CLIENT = "5dcfb9243fc64d3c1fd9de2a69c5bd";
-    String dummy_string="";
-	String body_rcvd_data = "";
-//	body_rcvd_data.reserve(1000);
-	byte var=A6_NOTOK;
-	String rcv_str="+CIPRCV";
+String dummy_string="";
+String body_rcvd_data = "";
+byte var=A6_NOTOK;
+String rcv_str="+CIPRCV";
 
 
 
@@ -27,8 +24,12 @@ A6httplib::~A6httplib()
 
 bool A6httplib::Post(String host, String path, String body)
 {
-     String X_IOTFY_ID = "24580020";
-     String X_IOTFY_CLIENT = "5dcfb9243fc64d3c1fd9de2a69c5bd";
+
+     // add your custom headers specific to IOT cloud service portal you are using.
+     // these are for Iotfy.co
+	 //  special Headers for making the POST request.
+     String X_IOTFY_ID = "XXXXXXX";
+     String X_IOTFY_CLIENT = "XXX";
 
 
 	_host = host;
@@ -41,7 +42,7 @@ bool A6httplib::Post(String host, String path, String body)
 
 	byte var=A6_NOTOK;
 
-    dummy_string="AT+CIPSTART=\"TCP\",\"" + _host + "\"," + _port;
+	dummy_string="AT+CIPSTART=\"TCP\",\"" + _host + "\"," + _port;
 	while(var!=A6_OK)
 	{
 		//close prior connections if any.
@@ -86,8 +87,7 @@ bool A6httplib::Post(String host, String path, String body)
     	log("\r\n");
 
 
-        // Adding two custom headers for Iotfy platform.
-
+    // Adding two custom headers for Iotfy platform.
     dummy_string  = "X-IOTFY-ID: ";
     dummy_string += X_IOTFY_ID;
     _A6l->A6conn->write(dummy_string.c_str());
@@ -102,7 +102,7 @@ bool A6httplib::Post(String host, String path, String body)
     _A6l->A6conn->write("\r\n");
 
     logln(dummy_string.c_str()) ; 
-        // custom headers end 
+    // custom headers end 
 
     dummy_string="Content-Type: application/json";
     _A6l->A6conn->write(dummy_string.c_str());
@@ -201,7 +201,6 @@ bool A6httplib::ConnectGPRS(String apn)
 
 String A6httplib::Get(String host, String path)
 {
-//	body_rcvd_data.reserve(1000);
     _path=path;
     _host=host;
     _port=80;
@@ -322,11 +321,8 @@ String A6httplib::Get(String host, String path)
 
 
 	  	}
-//	  	logln(body_rcvd_data);
-//		logln(F("now going to close tcp connection"));
 		_A6l->A6command((const char *)"AT+CIPCLOSE", "OK", "yy", 10000, 1, NULL); 
 		delay(100);
-//		logln("closed");
 		_A6l->A6command((const char *)"AT+CIPSTATUS", "OK", "yy", 10000, 2, NULL);
 		logln(F("http request done"));
 		return body_rcvd_data;
@@ -345,7 +341,6 @@ String A6httplib::getResponseData(String body_rcvd_data)
 
 	log(F("found double newline at  "));
 	logln(body_content_start);
-	// int body_content_end=0;
 	if(body_content_start!=-1)
 	{
 		for(int i=body_content_start;i<bytes_read;i++)
