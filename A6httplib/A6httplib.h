@@ -2,16 +2,15 @@
 #define A6httplib_h
 
 #include <Arduino.h>
-//#include <A6lib.h>
 
-class A6httplib
-{
+class A6httplib {
 private:
     String _host;
     int _port;
     String _path;
     String _apn;
     A6lib *_A6l;
+    int _ResponseLength;
 
 public:
     A6httplib();
@@ -21,10 +20,16 @@ public:
 
     bool ConnectGPRS(String apn);
 
-    bool AddHeader(String header);
-    bool Post(String host, String path, String body);
+    bool HTTPPostInitiate(String host, String path);
+    void AddHeader(String);
+    void HTTPPostRequest(const char *);
+
     String Get(String host, String path);
     String getResponseData(String);
+    int getResponseLength();
+
+    void CloseTCPConn();
+
 };
 #endif
 

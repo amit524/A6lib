@@ -443,29 +443,27 @@ byte A6lib::A6waitFor(const char *resp1, const char *resp2, int timeout, String 
 }
 
 
-// making modem functioning free from previous engagements, if any.  
+// making modem functioning free from previous engagements, if any.
 // In case of previous commands not fully sent or bytes missed, thus resetting  the modem terminal so that further commands work
 
-int A6lib::FreeModem(long timeout)
-{
-	byte retval=A6_NOTOK;
+int A6lib::FreeModem(long timeout) {
+    byte retval = A6_NOTOK;
     logln(F("Setting module free from past command..."));
-	long ptime=millis();
-	long now=0;
-	while(1)
-	{
-		now=millis();
-		if(now-ptime > timeout || retval==0)
-		{
-		A6conn->write("\r\n");
-		delay(1000);
-        byte retval=A6command("AT", "OK", "yy", 1000, 1, NULL);
-		if(retval==A6_OK)
-			log("breaking out:\t");
-			log("\t\t");
-			logln(retval);
-			break;
-		}	
-	}
+    long ptime = millis();
+    long now = 0;
+    while (1) {
+        now = millis();
+        if (now - ptime > timeout || retval == 0) {
+            A6conn->write("\r\n");
+            delay(1000);
+            byte retval = A6command("AT", "OK", "yy", 1000, 1, NULL);
+            if (retval == A6_OK) {
+                log("breaking out:\t");
+            }
+            log("\t\t");
+            logln(retval);
+            break;
+        }
+    }
     return A6_OK;
 }
