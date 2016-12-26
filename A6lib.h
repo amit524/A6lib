@@ -93,7 +93,9 @@ public:
     byte deleteSMS(int index);
     byte setSMScharset(String charset);
 
-    int getFree(long timeout);
+    // making modem functioning free from previous engagements, if any.  
+    // In case of previous commands not fully sent or bytes missed, thus resetting  the modem terminal so that further commands work
+    int FreeModem(long timeout);
 
     void setVol(byte level);
     void enableSpeaker(byte enable);
