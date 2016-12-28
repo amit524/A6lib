@@ -31,11 +31,11 @@ bool A6httplib::HTTPPostInitiate(String host, String path) {
 
         var = _A6l->A6command(dummy_string.c_str(), "CONNECT OK", "yy", 30000, 1, NULL); //start up the connection
         logln(var);
-        while (_A6l->getFree(3000) != 0);
+        while (_A6l->FreeModem(3000) != 0);
         _A6l->A6command("AT+CSQ", "OK", "yy", 2000, 2, NULL); //start up the connection
         logln("AT+CSQ");
         delay(200);
-        while (_A6l->getFree(3000) != 0);
+        while (_A6l->FreeModem(3000) != 0);
 
     }
 
@@ -136,31 +136,31 @@ bool A6httplib::ConnectGPRS(String apn) {
 
     while (retstatus != A6_OK) {
         retstatus = _A6l->A6command((const char *)"AT+CGATT?", "OK", "yy", 20000, 1, NULL);
-        while (_A6l->getFree(3000) != 0);
+        while (_A6l->FreeModem(3000) != 0);
     }
     retstatus = 1;
 
     while (retstatus != A6_OK) {
         retstatus = _A6l->A6command((const char *)"AT+CGATT=1", "OK", "yy", 20000, 2, NULL);
-        while (_A6l->getFree(3000) != 0);
+        while (_A6l->FreeModem(3000) != 0);
     }
     retstatus = 1;
 
     _A6l->A6conn->write("AT+CSQ"); //Signal Quality
     logln("AT+CSQ");
     delay(200);
-    while (_A6l->getFree(3000) != 0);
+    while (_A6l->FreeModem(3000) != 0);
 
     while (retstatus != A6_OK) {
         dummy_string = "AT+CGDCONT=1,\"IP\",\"" + _APN + "\"";
         retstatus = _A6l->A6command(dummy_string.c_str(), "OK", "yy", 20000, 2, NULL); //bring up wireless connection
-        while (_A6l->getFree(3000) != 0);
+        while (_A6l->FreeModem(3000) != 0);
     }
     retstatus = 1;
 
     while (retstatus != A6_OK) {
         retstatus = _A6l->A6command((const char *)"AT+CGACT=1,1", "OK", "yy", 10000, 2, NULL);
-        while (_A6l->getFree(3000) != 0);
+        while (_A6l->FreeModem(3000) != 0);
         // delay(10000);
     }
 }
@@ -192,11 +192,11 @@ String A6httplib::Get(String host, String path) {
         var = _A6l->A6command(dummy_string.c_str(), "CONNECT OK", "yy", 30000, 1, NULL); //start up the connection
         //logln(dummy_string.c_str());
         logln(var);
-        while (_A6l->getFree(3000) != 0);
+        while (_A6l->FreeModem(3000) != 0);
         _A6l->A6command("AT+CSQ", "OK", "yy", 2000, 2, NULL); //start up the connection
         logln(F("AT+CSQ"));
         delay(200);
-        while (_A6l->getFree(3000) != 0);
+        while (_A6l->FreeModem(3000) != 0);
 
     }
 
