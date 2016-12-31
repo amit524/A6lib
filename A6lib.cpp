@@ -443,9 +443,9 @@ byte A6lib::A6waitFor(const char *resp1, const char *resp2, int timeout, String 
 }
 
 
-// making modem functioning free from previous engagements, if any.
-// In case of previous commands not fully sent or bytes missed, thus resetting  the modem terminal so that further commands work
-
+// Return the modem to a state where it can receive commands.
+// The modem might get stuck in a half-way state after some commands,
+// but we can send a blank line to make it return to the baseline state.
 int A6lib::FreeModem(long timeout) {
     byte retval = A6_NOTOK;
     logln(F("Setting module free from past command..."));
